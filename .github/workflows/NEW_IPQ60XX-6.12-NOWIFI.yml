@@ -1,4 +1,4 @@
-name: NEW_IPQ60XX-6.12-NOWIFI
+name: IPQ60XX-6.12-NOWIFI
 
 on:
   workflow_dispatch:
@@ -43,6 +43,8 @@ jobs:
       with:
         timeout_minutes: 30
         max_attempts: 3
+        retry_on: error
+        retry_wait_seconds: 30
         command: |
           sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.org/init_build_environment.sh)'
           sudo -E apt -yqq install dos2unix
@@ -68,6 +70,8 @@ jobs:
       with:
         timeout_minutes: 10
         max_attempts: 3
+        retry_on: error
+        retry_wait_seconds: 15
         command: |
           df -hT $GITHUB_WORKSPACE
           git clone --depth 1 -b $REPO_BRANCH $REPO_URL openwrt
@@ -103,6 +107,8 @@ jobs:
       with:
         timeout_minutes: 20
         max_attempts: 3
+        retry_on: error
+        retry_wait_seconds: 20
         command: |
           cd $OPENWRT_PATH
           ./scripts/feeds update -a
@@ -121,6 +127,8 @@ jobs:
       with:
         timeout_minutes: 60
         max_attempts: 3
+        retry_on: error
+        retry_wait_seconds: 30
         command: |
           cd $OPENWRT_PATH
           make defconfig
@@ -134,6 +142,8 @@ jobs:
       with:
         timeout_minutes: 360
         max_attempts: 2
+        retry_on: error
+        retry_wait_seconds: 60
         command: |
           cd $OPENWRT_PATH
           echo -e "$(nproc) thread compile"
