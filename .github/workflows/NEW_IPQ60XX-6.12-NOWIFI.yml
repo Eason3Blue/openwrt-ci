@@ -156,13 +156,6 @@ jobs:
       if: (!cancelled())
       run: df -hT
 
-    - name: Upload Bin Directory(上传固件)
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      uses: actions/upload-artifact@main
-      with:
-        name: ${{ env.SOURCE_REPO }}-bin-${{ env.DEVICE_TARGET }}-${{ env.DEVICE_SUBTARGET }}-${{ env.FILE_DATE }}
-        path: ${{ env.OPENWRT_PATH }}/bin
-
     - name: Organize Files(整理文件)
       if: steps.compile.outputs.status == 'success'
       run: |
@@ -170,8 +163,13 @@ jobs:
         cat sha256sums
         echo "VERSION_KERNEL=$(find -type f -name "*.manifest" -exec grep -oP '^kernel - \K.*?(?=~|-\d+-)' {} \;)" >> $GITHUB_ENV
         cp $OPENWRT_PATH/.config build.config
-        mv -f $OPENWRT_PATH/bin/packages/*/*/*.ipk packages
-        tar -zcf Packages.tar.gz packages
+
+        mkdir -p packages
+        if ls $OPENWRT_PATH/bin/packages/*/*/*.ipk >/dev/null 2>&1; then
+          mv -f $OPENWRT_PATH/bin/packages/*/*/*.ipk packages
+          tar -zcf Packages.tar.gz packages
+        fi
+
         rm -rf packages feeds.buildinfo version.buildinfo
         echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
 
