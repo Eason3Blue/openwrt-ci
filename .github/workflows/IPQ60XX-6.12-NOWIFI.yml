@@ -70,6 +70,12 @@ jobs:
         VERSION_KERNEL=$(grep -oP 'LINUX_KERNEL_HASH-\K[0-9]+\.[0-9]+\.[0-9]+' target/linux/generic/kernel-6.12)
         echo "VERSION_KERNEL=$VERSION_KERNEL" >> $GITHUB_ENV
 
+    - name: Apply Kernel Patch
+      run: |
+        cd $OPENWRT_PATH
+        mkdir -p target/linux/qualcommax/patches-6.12
+        cp $GITHUB_WORKSPACE/patches/*.patch target/linux/qualcommax/patches-6.12/
+
     - name: Generate Variables(生成变量)
       run: |
         cp $CONFIG_FILE $OPENWRT_PATH/.config
