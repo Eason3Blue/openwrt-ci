@@ -1,0 +1,11 @@
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@
+ static struct sk_buff *skb_recycle(struct sk_buff *skb)
+ {
+    skb->data = skb->head;
+    skb_reset_tail_pointer(skb);
+    skb->len = 0;
+    skb->data_len = 0;
+    return skb;
+ }
