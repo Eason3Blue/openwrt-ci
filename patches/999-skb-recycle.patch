@@ -1,11 +1,28 @@
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 9f7a1b7..9f7a1b7 100644
 --- a/net/core/skbuff.c
 +++ b/net/core/skbuff.c
-@@
- static struct sk_buff *skb_recycle(struct sk_buff *skb)
+@@ -107,6 +107,23 @@
+ #include <linux/highmem.h>
+ #include <linux/inetdevice.h>
+
++/*
++ * skb recycle support for NSS fastpath
++ *
++ * Allows drivers to recycle skb buffers instead of freeing them.
++ * This reduces allocation overhead in high PPS scenarios.
++ */
++
++struct sk_buff *skb_recycle(struct sk_buff *skb)
++{
++    skb->data = skb->head;
++    skb_reset_tail_pointer(skb);
++    skb->len = 0;
++    skb->data_len = 0;
++    skb->cloned = 0;
++    return skb;
++}
++EXPORT_SYMBOL(skb_recycle);
+ 
+ static void skb_release_head_state(struct sk_buff *skb)
  {
-    skb->data = skb->head;
-    skb_reset_tail_pointer(skb);
-    skb->len = 0;
-    skb->data_len = 0;
-    return skb;
- }
